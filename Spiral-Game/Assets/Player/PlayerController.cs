@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
     public float attackRange = 1.5f;
     public int attackDamage = 1;
     public LayerMask enemyLayer;
+    public LayerMask DestroyableLayer;
 
     public float attackCooldown = 0.5f;
 
@@ -114,11 +115,11 @@ public class PlayerController : MonoBehaviour
         // Spieler drehen
         if (moveInput > 0)
 {
-            transform.localScale = new Vector3(1, 1, 1);
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x),transform.localScale.y,transform.localScale.z);
         }
         else if (moveInput < 0)
         {
-            transform.localScale = new Vector3(-1, 1, 1);
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x),transform.localScale.y,transform.localScale.z);
         }
     
 
@@ -167,7 +168,7 @@ public class PlayerController : MonoBehaviour
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
             attackPoint.position,
             attackRange,
-            enemyLayer
+            enemyLayer | DestroyableLayer
         );
 
         foreach (Collider2D enemy in hitEnemies)
@@ -183,6 +184,15 @@ public class PlayerController : MonoBehaviour
                 enemyHealth.TakeDamage(
                     attackDamage,
                     knockbackDirection
+                );
+            }
+
+            WallHealth wallHealth = enemy.GetComponent<WallHealth>();
+
+            if (wallHealth != null)
+            {
+                wallHealth.TakeDamage(
+                attackDamage
                 );
             }
         }
